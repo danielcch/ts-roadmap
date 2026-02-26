@@ -1,20 +1,24 @@
 {
-  "name": "ts-roadmap",
-  "version": "1.0.0",
-  "description": "",
-  "type": "module",
-  "main": "index.js",
+	"name": "ts-roadmap",
+	"version": "1.0.0",
+	"description": "",
+	"type": "module",
+	"main": "index.js",
   "scripts": {
-    "test": "vitest run",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
-    "test:watch": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "pnpm lint && pnpm typecheck && pnpm test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.30.3",
-  "devDependencies": {
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
-  }
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.30.3",
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.4",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.18"
+	}
 }
