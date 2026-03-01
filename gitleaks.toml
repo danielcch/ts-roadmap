@@ -1,0 +1,106 @@
+title = "ts-roadmap - common secrets rules"
+description = "Reglas comunes de detección de secretos (base). Ajusta allowlist para falsos positivos."
+version = "1.0"
+
+# ─────────────────────────────────────────────────────────────
+# ALLOWLIST GLOBAL (para reducir falsos positivos)
+# ─────────────────────────────────────────────────────────────
+[allowlist]
+description = "Ignora rutas típicas que generan ruido"
+paths = [
+  '''pnpm-lock\.yaml''',
+  '''package-lock\.json''',
+  '''yarn\.lock''',
+  '''node_modules/''',
+  '''dist/''',
+  '''build/''',
+  '''coverage/'''
+]
+
+# ─────────────────────────────────────────────────────────────
+# REGLAS
+# ─────────────────────────────────────────────────────────────
+
+# 1) Claves privadas PEM (esto es lo más crítico)
+[[rules]]
+id = "private-key-pem"
+description = "Bloques de clave privada (PEM)"
+regex = '''-----BEGIN (?:RSA|EC|DSA|OPENSSH|PGP)? ?PRIVATE KEY-----[\s\S]*?-----END (?:RSA|EC|DSA|OPENSSH|PGP)? ?PRIVATE KEY-----'''
+tags = ["key", "pem", "critical"]
+
+# 2) AWS Access Key ID
+[[rules]]
+id = "aws-access-key-id"
+description = "AWS Access Key ID"
+regex = '''\b(A3T[A-Z0-9]|AKIA|ASIA|AGPA|AIDA|ANPA|AROA|AIPA|ANVA)[A-Z0-9]{16}\b'''
+tags = ["aws", "key"]
+
+# 3) AWS Secret Access Key (heurístico: clave larga base64-ish cerca de 'aws' o 'secret')
+[[rules]]
+id = "aws-secret-access-key"
+description = "AWS Secret Access Key (cerca de aws/secret)"
+regex = '''(?i)\b(aws[_\- ]?(secret|access)?[_\- ]?key|secret[_\- ]?access[_\- ]?key)\b\s*[:=]\s*['"]?[A-Za-z0-9/+=]{35,}['"]?'''
+tags = ["aws", "secret"]
+
+# 4) GitHub tokens (ghp, gho, ghu, ghs, ghr)
+[[rules]]
+id = "github-token"
+description = "GitHub token (ghp/gho/ghu/ghs/ghr)"
+regex = '''\bgh[opusr]_[A-Za-z0-9]{36,}\b'''
+tags = ["github", "token"]
+
+# 5) GitLab tokens (glpat-...)
+[[rules]]
+id = "gitlab-token"
+description = "GitLab Personal Access Token"
+regex = '''\bglpat-[A-Za-z0-9_\-]{20,}\b'''
+tags = ["gitlab", "token"]
+
+# 6) Slack tokens (xoxb/xoxp/xoxa/xoxr)
+[[rules]]
+id = "slack-token"
+description = "Slack token"
+regex = '''\bxox[baprs]-[A-Za-z0-9-]{10,}\b'''
+tags = ["slack", "token"]
+
+# 7) Stripe keys (sk_live, rk_live)
+[[rules]]
+id = "stripe-live-secret"
+description = "Stripe live secret key"
+regex = '''\b(?:sk_live|rk_live)_[A-Za-z0-9]{20,}\b'''
+tags = ["stripe", "token", "payment"]
+
+# 8) OpenAI API key (sk-...)
+[[rules]]
+id = "openai-api-key"
+description = "OpenAI API key (heurístico)"
+regex = '''\bsk-[A-Za-z0-9]{20,}\b'''
+tags = ["openai", "token"]
+
+# 9) Google API key (AIza...)
+[[rules]]
+id = "google-api-key"
+description = "Google API key (AIza...)"
+regex = '''\bAIza[0-9A-Za-z\-_]{35}\b'''
+tags = ["google", "token"]
+
+# 10) JWT (tres bloques base64url separados por puntos)
+[[rules]]
+id = "jwt"
+description = "JWT token (posible credencial)"
+regex = '''\beyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\b'''
+tags = ["jwt", "token"]
+
+# 11) Passwords en texto (heurístico, puede dar falsos positivos)
+[[rules]]
+id = "generic-password-assignment"
+description = "Asignación de password/secret/token (heurístico)"
+regex = '''(?i)\b(password|passwd|pwd|secret|api[_\- ]?key|token|access[_\- ]?token|refresh[_\- ]?token)\b\s*[:=]\s*['"]?[^'"\s]{6,}['"]?'''
+tags = ["generic", "secret"]
+
+# 12) Connection strings comunes (DB URLs) con credenciales embebidas (heurístico)
+[[rules]]
+id = "db-connection-string"
+description = "Posible URL de BD con usuario:password@host"
+regex = '''(?i)\b(postgres(ql)?|mysql|mariadb|mongodb(\+srv)?|redis)://[^:\s/]+:[^@\s/]+@[^ \s]+'''
+tags = ["db", "secret"]

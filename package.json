@@ -4,20 +4,21 @@
 	"description": "",
 	"type": "module",
 	"main": "index.js",
-  "scripts": {
-    "lint": "biome lint .",
-    "format": "biome format --write .",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "check": "pnpm lint && pnpm typecheck && pnpm test"
-  },
+	"scripts": {
+		"lint": "biome lint .",
+		"format": "biome format --write .",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"check": "pnpm lint && pnpm typecheck && pnpm test"
+	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"packageManager": "pnpm@10.30.3",
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.4",
+		"husky": "^9.1.7",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.18"
 	}
