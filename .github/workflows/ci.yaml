@@ -14,10 +14,8 @@ jobs:
 
       - name: Gitleaks (secrets scan)
         uses: gitleaks/gitleaks-action@v2
-        with:
-          config-path: gitleaks.toml
-          fail: true
-          verbose: false
+        env:
+          GITLEAKS_CONFIG: gitleaks.toml
 
       - name: Setup Node (LTS)
         uses: actions/setup-node@v4
